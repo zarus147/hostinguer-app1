@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reporte Diario de Conductor — SDLA-ACOP-001</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap');
+
+:root {
+  --navy: #0d1f3c;
+  --navy2: #1a3260;
+  --gold: #c8922a;
+  --gold-light: #f0b845;
+  --red: #b91c1c;
+  --surface: #f4f1eb;
+  --card: #ffffff;
+  --border: #c9c2b4;
+  --border-light: #e5dfd6;
+  --text: #1a1209;
+  --muted: #6b5e4e;
+  --green: #15803d;
+  --green-light: #dcfce7;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Source Sans 3', sans-serif; background: var(--surface); color: var(--text); min-height: 100vh; }
+
+/* HEADER */
+.header { background: var(--navy); position: relative; }
+.header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold)); }
+.header-inner { display: flex; align-items: center; justify-content: space-between; padding: 16px 28px 14px; gap: 16px; flex-wrap: wrap; }
+.header-left { display: flex; flex-direction: column; gap: 2px; }
+.company-name { font-family: 'Oswald', sans-serif; font-size: 0.7rem; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; color: var(--gold-light); }
+.doc-title { font-family: 'Oswald', sans-serif; font-size: 1.6rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #fff; line-height: 1; }
+.header-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.code-badge { display: inline-block; background: var(--gold); color: var(--navy); font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 0.72rem; letter-spacing: 1.5px; padding: 3px 10px; border-radius: 2px; }
+.version-text { color: #94a3b8; font-size: 0.7rem; letter-spacing: 1px; }
+.storage-badge { display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.08); border-radius: 2px; padding: 3px 9px; font-size: 0.68rem; letter-spacing: 1px; color: #94a3b8; font-family: 'Oswald', sans-serif; }
+.storage-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* MAIN TABS */
+.tab-bar { background: var(--navy2); display: flex; padding: 0 28px; border-top: 1px solid rgba(255,255,255,0.07); flex-wrap: wrap; }
+.tab-btn { background: none; border: none; color: #94a3b8; font-family: 'Oswald', sans-serif; font-size: 0.88rem; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; padding: 10px 20px; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; }
+.tab-btn:hover { color: #e2d9c9; }
+.tab-btn.active { color: var(--gold-light); border-bottom-color: var(--gold-light); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* CONTAINER */
+.container { max-width: 1160px; margin: 0 auto; padding: 20px 16px 40px; }
+
+/* SECTIONS */
+.section { background: var(--card); border: 1px solid var(--border); border-radius: 3px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow: hidden; }
+.section-header { background: var(--navy); color: white; padding: 7px 16px; display: flex; align-items: center; gap: 8px; font-family: 'Oswald', sans-serif; font-size: 0.82rem; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; }
+.section-header .marker { width: 8px; height: 8px; background: var(--gold); border-radius: 1px; flex-shrink: 0; }
+.section-body { padding: 14px 16px; }
+
+/* ZONA PRODUCTIVA HIGHLIGHT */
+.zona-section .section-header { background: linear-gradient(90deg, #1a3a1a, #2d5a2d); }
+.zona-section .marker { background: #4ade80; }
+
+/* FORM */
+.form-grid { display: grid; gap: 10px; }
+.grid-5 { grid-template-columns: repeat(5, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-fuel { grid-template-columns: 1fr 1fr 1fr 1fr 1fr; }
+.form-group { display: flex; flex-direction: column; gap: 3px; }
+.form-group.span2 { grid-column: span 2; }
+
+label { font-size: 0.65rem; font-weight: 600; letter-spacing: 1.8px; text-transform: uppercase; color: var(--muted); }
+
+input, select, textarea { border: 1.5px solid var(--border); border-radius: 2px; padding: 7px 9px; font-family: 'Source Sans 3', sans-serif; font-size: 0.875rem; color: var(--text); background: white; transition: border-color 0.15s, background 0.15s; width: 100%; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--gold); background: #fffdf7; }
+input.inherited { background: var(--green-light) !important; border-color: #86efac !important; color: var(--green) !important; font-weight: 600; }
+input[readonly] { background: #f5f3ef; color: var(--muted); cursor: not-allowed; }
+textarea { resize: vertical; min-height: 52px; }
+
+/* PLACA INDICATOR */
+.placa-indicator { display: inline-flex; align-items: center; gap: 8px; background: var(--navy); color: white; padding: 4px 12px; border-radius: 2px; font-family: 'Oswald', sans-serif; font-size: 0.8rem; letter-spacing: 1.5px; margin-bottom: 10px; }
+.placa-indicator .pi-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); }
+
+/* DAY NAVIGATOR */
+.day-nav { background: white; border: 1px solid var(--border); border-radius: 3px; padding: 10px 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.day-nav-label { font-family: 'Oswald', sans-serif; font-size: 1.05rem; font-weight: 700; letter-spacing: 1px; color: var(--navy); flex: 1; min-width: 80px; }
+.day-pills { display: flex; gap: 5px; flex-wrap: wrap; }
+.day-pill { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--border); background: white; font-family: 'Oswald', sans-serif; font-size: 0.78rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; color: var(--muted); }
+.day-pill.active { background: var(--navy); color: white; border-color: var(--navy); }
+.day-pill.has-data { border-color: var(--gold); color: var(--gold); }
+.day-pill.active.has-data { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+
+/* BUTTONS */
+.btn { font-family: 'Oswald', sans-serif; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; border: none; border-radius: 2px; cursor: pointer; transition: all 0.15s; font-size: 0.82rem; padding: 8px 16px; white-space: nowrap; }
+.btn-navy { background: var(--navy); color: white; }
+.btn-navy:hover { background: var(--navy2); }
+.btn-gold { background: var(--gold); color: var(--navy); }
+.btn-gold:hover { background: var(--gold-light); }
+.btn-green { background: var(--green); color: white; }
+.btn-green:hover { background: #166534; }
+.btn-red { background: var(--red); color: white; }
+.btn-red:hover { background: #991b1b; }
+.btn-sm { padding: 5px 11px; font-size: 0.76rem; }
+.btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--muted); }
+.btn-outline:hover { border-color: var(--navy); color: var(--navy); }
+
+/* ACTIVITIES TABLE */
+.act-scroll { overflow-x: auto; }
+.act-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 920px; }
+.act-table th { background: #f0ece4; padding: 7px 8px; text-align: left; font-size: 0.64rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 700; border-bottom: 2px solid var(--border); white-space: nowrap; font-family: 'Oswald', sans-serif; }
+.act-table td { padding: 4px 4px; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
+.act-table tr:last-child td { border-bottom: none; }
+.act-table input, .act-table select { padding: 5px 7px; font-size: 0.82rem; border-radius: 2px; min-width: 60px; }
+.row-num { font-family: 'Oswald', sans-serif; font-weight: 700; color: var(--muted); font-size: 0.78rem; text-align: center; padding: 0 6px !important; min-width: 28px; }
+.act-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; flex-wrap: wrap; gap: 8px; }
+
+/* SUMMARY PLATE TABS */
+.plate-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 14px; }
+.plate-tab { font-family: 'Oswald', sans-serif; font-size: 0.82rem; font-weight: 600; letter-spacing: 1.5px; padding: 7px 16px; border-radius: 2px 2px 0 0; cursor: pointer; border: 1.5px solid var(--border); border-bottom: none; background: white; color: var(--muted); text-transform: uppercase; transition: all 0.15s; position: relative; }
+.plate-tab.active { background: var(--navy); color: var(--gold-light); border-color: var(--navy); }
+.plate-tab .count-badge { display: inline-block; background: var(--gold); color: var(--navy); border-radius: 10px; font-size: 0.65rem; padding: 1px 6px; margin-left: 5px; font-weight: 700; }
+.plate-tab.active .count-badge { background: var(--gold-light); }
+
+/* SUMMARY TABLE */
+.sum-wrap { border: 1.5px solid var(--border); border-radius: 0 3px 3px 3px; background: white; }
+.sum-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; min-width: 1200px; }
+.sum-table th { background: var(--navy); color: white; padding: 8px 10px; text-align: left; font-size: 0.63rem; letter-spacing: 1.5px; text-transform: uppercase; white-space: nowrap; font-family: 'Oswald', sans-serif; border-right: 1px solid rgba(255,255,255,0.1); }
+.sum-table td { padding: 7px 10px; border-bottom: 1px solid var(--border-light); white-space: nowrap; border-right: 1px solid var(--border-light); }
+.sum-table tr:nth-child(even) td { background: #faf8f4; }
+.sum-table tr:hover td { background: #fef6e4; }
+.no-data-cell { text-align: center; color: var(--muted); padding: 28px !important; font-style: italic; white-space: normal !important; }
+
+/* STATS */
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+.stat-card { background: white; border: 1px solid var(--border); border-radius: 3px; padding: 10px 14px; border-top: 3px solid var(--gold); }
+.stat-label { font-size: 0.62rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-family: 'Oswald', sans-serif; font-weight: 500; }
+.stat-value { font-family: 'Oswald', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--navy); line-height: 1.1; margin-top: 2px; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 22px; right: 22px; background: var(--navy); color: white; padding: 11px 18px; border-radius: 3px; border-left: 4px solid var(--gold); font-family: 'Oswald', sans-serif; font-size: 0.88rem; letter-spacing: 1px; opacity: 0; transform: translateY(14px); transition: all 0.3s; z-index: 9999; pointer-events: none; max-width: 300px; }
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* SAVE INDICATOR */
+.save-indicator { display: flex; align-items: center; gap: 6px; font-family: 'Oswald', sans-serif; font-size: 0.72rem; letter-spacing: 1px; color: var(--green); opacity: 0; transition: opacity 0.4s; }
+.save-indicator.visible { opacity: 1; }
+.save-indicator::before { content: '✓'; font-weight: 700; }
+
+@media (max-width: 768px) {
+  .grid-5, .grid-4, .grid-fuel { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .form-group.span2 { grid-column: span 1; }
+  .header-inner { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="header-left">
+      <span class="company-name">Minera Sol de los Andes</span>
+      <span class="doc-title">Reporte Diario de Conductor</span>
+    </div>
+    <div class="header-right">
+      <span class="code-badge">SDLA-ACOP-001</span>
+      <span class="version-text">VERSIÓN 2</span>
+      <span class="storage-badge"><span class="storage-dot"></span> DATOS GUARDADOS LOCALMENTE</span>
+    </div>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('registro', this)">▪ Registro</button>
+    <button class="tab-btn" onclick="switchTab('resumen', this)">▪ Resumen por Placas</button>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB: REGISTRO -->
+<!-- ================================================================ -->
+<div id="tab-registro" class="tab-panel active">
+<div class="container">
+
+  <!-- ZONA PRODUCTIVA -->
+  <div class="section zona-section">
+    <div class="section-header"><span class="marker"></span>Zona Productiva</div>
+    <div class="section-body">
+      <div class="form-grid grid-3">
+        <div class="form-group span2">
+          <label>Seleccionar Zona</label>
+          <select id="zona">
+            <option value="">— Seleccionar Zona —</option>
+            <option>PLANTA SDLA</option>
+            <option>OFICINA BARRENO</option>
+            <option>OFICINA ISPACAS</option>
+            <option>OFICINA PEDREGAL</option>
+            <option>OFICINA SAN CRISTOBAL</option>
+            <option>OFICINA ORCOPAMPA</option>
+            <option>OFICINA ALTO MOLINO</option>
+            <option>OFICINA CUSCO</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IDENTIFICACIÓN DEL EQUIPO -->
+  <div class="section">
+    <div class="section-header"><span class="marker"></span>Identificación del Equipo</div>
+    <div class="section-body">
+      <div id="placa-indicator-wrap"></div>
+      <div class="form-grid grid-5">
+
+        <div class="form-group">
+          <label>Placa</label>
+          <select id="placa" onchange="onPlacaChange()">
+            <option value="">— Seleccionar —</option>
+            <option>W7U 853</option>
+            <option>BNQ 902</option>
+            <option value="OTRO">OTRO</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="placa-manual-wrap" style="display:none">
+          <label>Placa (ingresar)</label>
+          <input type="text" id="placa-manual" placeholder="Ej. ABC 123" oninput="onPlacaManualChange()">
+        </div>
+
+        <div class="form-group">
+          <label>Equipo</label>
+          <select id="equipo">
+            <option value="">— Seleccionar —</option>
+            <option>CAMIONETA</option>
+            <option>IZUSU</option>
+            <option>VOLQUETE</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Modelo</label>
+          <select id="modelo">
+            <option value="">— Seleccionar —</option>
+            <option>HILUX</option>
+            <option>NPR</option>
+            <option value="OTRO">OTRO</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Fecha</label>
+          <input type="date" id="fecha">
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CONDUCTORES -->
+  <div class="section">
+    <div class="section-header"><span class="marker"></span>Conductores</div>
+    <div class="section-body">
+      <div class="form-grid grid-4">
+        <div class="form-group">
+          <label>Conductor 1</label>
+          <select id="c1-select" onchange="onConductorChange(1)">
+            <option value="">— Seleccionar —</option>
+            <option>JHONSON, BALDEON SAJAMI</option>
+            <option>JOSE LUIS, MAMANI PUMA</option>
+            <option>JEAN MARCO, GAMARRA ALMIRON</option>
+            <option value="OTRO">OTRO (ingresar)</option>
+          </select>
+        </div>
+        <div class="form-group" id="c1-manual-wrap" style="display:none">
+          <label>Nombre (manual)</label>
+          <input type="text" id="c1-manual" placeholder="Apellidos, Nombres">
+        </div>
+        <div class="form-group">
+          <label>DNI Conductor 1</label>
+          <input type="text" id="c1-dni" placeholder="8 dígitos" maxlength="8">
+        </div>
+        <div class="form-group">
+          <label>Conductor 2</label>
+          <select id="c2-select" onchange="onConductorChange(2)">
+            <option value="">— Seleccionar —</option>
+            <option>JHONSON, BALDEON SAJAMI</option>
+            <option>JOSE LUIS, MAMANI PUMA</option>
+            <option>JEAN MARCO, GAMARRA ALMIRON</option>
+            <option value="OTRO">OTRO (ingresar)</option>
+          </select>
+        </div>
+        <div class="form-group" id="c2-manual-wrap" style="display:none">
+          <label>Nombre (manual)</label>
+          <input type="text" id="c2-manual" placeholder="Apellidos, Nombres">
+        </div>
+        <div class="form-group">
+          <label>DNI Conductor 2</label>
+          <input type="text" id="c2-dni" placeholder="8 dígitos" maxlength="8">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMBUSTIBLE -->
+  <div class="section">
+    <div class="section-header"><span class="marker"></span>Control de Combustible (B-5)</div>
+    <div class="section-body">
+      <div class="form-grid grid-fuel">
+        <div class="form-group">
+          <label>Inicial (gal)</label>
+          <input type="number" id="fuel-ini" placeholder="0.0" step="0.01" min="0" oninput="calcFuel()">
+        </div>
+        <div class="form-group">
+          <label>Abastecimiento (gal)</label>
+          <input type="number" id="fuel-abast" placeholder="0.0" step="0.01" min="0" oninput="calcFuel()">
+        </div>
+        <div class="form-group">
+          <label>Final (gal)</label>
+          <input type="number" id="fuel-fin" placeholder="0.0" step="0.01" min="0" oninput="calcFuel()">
+        </div>
+        <div class="form-group">
+          <label>Consumo (gal) — auto</label>
+          <input type="number" id="fuel-consumo" readonly placeholder="—" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>N° Comprobante / Km. abastec.</label>
+          <input type="text" id="fuel-comp" placeholder="N° comprobante">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVEGADOR DÍAS -->
+  <div class="day-nav">
+    <div class="day-nav-label" id="day-label">DÍA 1</div>
+    <div class="day-pills" id="day-pills"></div>
+    <button class="btn btn-navy btn-sm" onclick="addDay()">+ Día</button>
+    <button class="btn btn-green btn-sm" onclick="saveDay()">💾 Guardar Día</button>
+    <span class="save-indicator" id="save-indicator">GUARDADO</span>
+  </div>
+
+  <!-- ACTIVIDADES -->
+  <div class="section">
+    <div class="section-header"><span class="marker"></span>Actividades del Día</div>
+    <div class="section-body">
+      <div class="act-scroll">
+        <table class="act-table" id="act-table">
+          <thead>
+            <tr>
+              <th style="text-align:center">#</th>
+              <th style="min-width:170px">Frente de Trabajo</th>
+              <th style="min-width:220px">Descripción del Trabajo</th>
+              <th style="min-width:98px">Kilom. Inicial</th>
+              <th style="min-width:98px">Kilom. Final</th>
+              <th style="min-width:98px">Horom. Inic.</th>
+              <th style="min-width:98px">Horom. Final</th>
+              <th style="min-width:160px">Observaciones</th>
+              <th style="min-width:36px"></th>
+            </tr>
+          </thead>
+          <tbody id="act-body"></tbody>
+        </table>
+      </div>
+      <div class="act-bar">
+        <button class="btn btn-navy btn-sm" onclick="addActivity()">+ Agregar Actividad</button>
+        <span id="act-count" style="font-size:0.75rem;color:var(--muted);font-family:'Oswald',sans-serif;letter-spacing:1px"></span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ================================================================ -->
+<!-- TAB: RESUMEN -->
+<!-- ================================================================ -->
+<div id="tab-resumen" class="tab-panel">
+<div class="container">
+
+  <div class="stats-row" id="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Total Días</div>
+      <div class="stat-value" id="st-dias">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Actividades</div>
+      <div class="stat-value" id="st-acts">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Km Recorridos</div>
+      <div class="stat-value" id="st-km">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Hrs Operadas</div>
+      <div class="stat-value" id="st-hr">0</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><span class="marker"></span>Resumen de Movimientos por Placa</div>
+    <div class="section-body">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+        <span style="font-family:'Oswald',sans-serif;font-size:0.8rem;color:var(--muted);letter-spacing:1px" id="sum-count">Sin registros</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-gold btn-sm" onclick="exportExcel()">⬇ Descargar Excel (todas las placas)</button>
+          <button class="btn btn-red btn-sm" onclick="clearAll()">🗑 Limpiar todo</button>
+        </div>
+      </div>
+
+      <!-- PLATE TABS -->
+      <div class="plate-tabs" id="plate-tabs"></div>
+
+      <!-- TABLE WRAPPER -->
+      <div class="sum-wrap">
+        <div style="overflow-x:auto">
+          <table class="sum-table" id="sum-table">
+            <thead>
+              <tr>
+                <th>Día</th>
+                <th>Zona Productiva</th>
+                <th>Fecha</th>
+                <th>Placa</th>
+                <th>Equipo</th>
+                <th>Modelo</th>
+                <th>Conductor 1</th>
+                <th>DNI C1</th>
+                <th>Conductor 2</th>
+                <th>DNI C2</th>
+                <th>Comb. Ini (gal)</th>
+                <th>Abastec. (gal)</th>
+                <th>Comb. Fin (gal)</th>
+                <th>Consumo (gal)</th>
+                <th>Comprobante</th>
+                <th>Act. #</th>
+                <th>Frente de Trabajo</th>
+                <th>Descripción</th>
+                <th>Km Inicial</th>
+                <th>Km Final</th>
+                <th>Horom. Inic.</th>
+                <th>Horom. Final</th>
+                <th>Observaciones</th>
+              </tr>
+            </thead>
+            <tbody id="sum-body">
+              <tr><td colspan="23" class="no-data-cell">No hay registros guardados.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================================================================
+   CONSTANTS
+================================================================ */
+const STORAGE_KEY = 'sdla_conductor_v2';
+const KNOWN_PLATES = ['W7U 853', 'BNQ 902'];
+const CONDUCTORS = ['JHONSON, BALDEON SAJAMI','JOSE LUIS, MAMANI PUMA','JEAN MARCO, GAMARRA ALMIRON'];
+
+/* ================================================================
+   STATE
+   masterData structure:
+   {
+     "W7U 853": { totalDays: N, days: { 1: {header, activities}, ... } },
+     "BNQ 902": { ... },
+     "OTRO_ABC123": { ... }
+   }
+================================================================ */
+let masterData = {};    // all stored data keyed by plate
+let currentPlate = '';  // currently selected plate key
+let currentDay = 1;
+let activePlateTab = ''; // which plate tab is shown in summary
+
+/* ================================================================
+   PERSISTENCE
+================================================================ */
+function persistSave() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(masterData)); } catch(e) { console.warn('Storage error', e); }
+}
+
+function persistLoad() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) masterData = JSON.parse(raw);
+  } catch(e) { masterData = {}; }
+}
+
+/* ================================================================
+   INIT
+================================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  persistLoad();
+  document.getElementById('fecha').value = new Date().toISOString().slice(0,10);
+  renderDayPills();
+  renderActivities();
+});
+
+/* ================================================================
+   TABS
+================================================================ */
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'resumen') renderSummary();
+}
+
+/* ================================================================
+   PLACA CHANGE — core of persistence logic
+================================================================ */
+function getPlateKey() {
+  const sel = document.getElementById('placa').value;
+  if (sel === 'OTRO') {
+    const manual = document.getElementById('placa-manual').value.trim().toUpperCase();
+    return manual ? 'OTRO_' + manual : '';
+  }
+  return sel;
+}
+
+function onPlacaChange() {
+  const val = document.getElementById('placa').value;
+  document.getElementById('placa-manual-wrap').style.display = val === 'OTRO' ? '' : 'none';
+  if (val !== 'OTRO') applyPlateData(val);
+}
+
+function onPlacaManualChange() {
+  const key = getPlateKey();
+  if (key) applyPlateData(key);
+}
+
+function applyPlateData(plateKey) {
+  if (!plateKey) return;
+
+  // Save current plate data before switching
+  if (currentPlate && currentPlate !== plateKey) {
+    autoSaveCurrent();
+  }
+
+  currentPlate = plateKey;
+  updatePlacaIndicator();
+
+  if (masterData[plateKey]) {
+    // Load existing data for this plate
+    const pd = masterData[plateKey];
+    const totalDays = Object.keys(pd.days || {}).length || 1;
+
+    // Update day tracking
+    currentDay = totalDays; // go to last day
+    renderDayPills();
+
+    // Load last day's data into form
+    const dayKeys = Object.keys(pd.days || {}).map(Number).sort((a,b)=>a-b);
+    if (dayKeys.length > 0) {
+      const lastDay = dayKeys[dayKeys.length - 1];
+      currentDay = lastDay;
+      loadDayIntoForm(plateKey, lastDay);
+      renderDayPills();
+    }
+
+    toast(`✓ Datos de ${plateKey} cargados (${dayKeys.length} día${dayKeys.length!==1?'s':''})`);
+  } else {
+    // New plate — reset form day to 1
+    currentDay = 1;
+    clearForm(false); // don't clear placa fields
+    renderDayPills();
+    renderActivities();
+  }
+}
+
+function updatePlacaIndicator() {
+  const wrap = document.getElementById('placa-indicator-wrap');
+  if (!currentPlate) { wrap.innerHTML = ''; return; }
+  const hasData = !!masterData[currentPlate];
+  const days = hasData ? Object.keys(masterData[currentPlate].days || {}).length : 0;
+  wrap.innerHTML = `
+    <div class="placa-indicator">
+      <span class="pi-dot"></span>
+      PLACA ACTIVA: ${currentPlate}
+      ${hasData ? `&nbsp;|&nbsp; ${days} día${days!==1?'s':''} registrado${days!==1?'s':''}` : '&nbsp;|&nbsp; NUEVO REGISTRO'}
+    </div>`;
+}
+
+/* ================================================================
+   CONDUCTOR CHANGE
+================================================================ */
+function onConductorChange(n) {
+  const v = document.getElementById(`c${n}-select`).value;
+  document.getElementById(`c${n}-manual-wrap`).style.display = v === 'OTRO' ? '' : 'none';
+}
+
+/* ================================================================
+   FUEL
+================================================================ */
+function calcFuel() {
+  const ini = parseFloat(document.getElementById('fuel-ini').value) || 0;
+  const abast = parseFloat(document.getElementById('fuel-abast').value) || 0;
+  const fin = parseFloat(document.getElementById('fuel-fin').value) || 0;
+  const c = ini + abast - fin;
+  document.getElementById('fuel-consumo').value = c >= 0 ? c.toFixed(2) : '';
+}
+
+/* ================================================================
+   DAY NAVIGATION
+================================================================ */
+function getTotalDays() {
+  if (!currentPlate || !masterData[currentPlate]) return 1;
+  const keys = Object.keys(masterData[currentPlate].days || {});
+  return keys.length > 0 ? Math.max(...keys.map(Number)) : 1;
+}
+
+function renderDayPills() {
+  const container = document.getElementById('day-pills');
+  container.innerHTML = '';
+  const total = Math.max(getTotalDays(), currentDay);
+  for (let i = 1; i <= total; i++) {
+    const hasData = !!(currentPlate && masterData[currentPlate]?.days?.[i]);
+    const btn = document.createElement('button');
+    btn.className = 'day-pill' + (i === currentDay ? ' active' : '') + (hasData ? ' has-data' : '');
+    btn.textContent = i;
+    btn.onclick = () => goToDay(i);
+    container.appendChild(btn);
+  }
+  document.getElementById('day-label').textContent = `DÍA ${currentDay}`;
+}
+
+function addDay() {
+  if (!currentPlate) { toast('⚠ Seleccione una placa primero'); return; }
+  autoSaveCurrent();
+  const newDay = getTotalDays() + 1;
+  currentDay = newDay;
+  // Inherit km/horom from last activity of previous day
+  initNewDay(newDay);
+  renderDayPills();
+  renderActivities();
+  toast(`Día ${newDay} agregado`);
+}
+
+function goToDay(day) {
+  if (!currentPlate) { toast('⚠ Seleccione una placa primero'); return; }
+  autoSaveCurrent();
+  currentDay = day;
+  if (masterData[currentPlate]?.days?.[day]) {
+    loadDayIntoForm(currentPlate, day);
+  } else {
+    initNewDay(day);
+  }
+  renderDayPills();
+  renderActivities();
+}
+
+function initNewDay(day) {
+  // Try to inherit from previous day's last activity
+  const prevDay = day - 1;
+  const prevActs = masterData[currentPlate]?.days?.[prevDay]?.activities || [];
+  let kmIni = '', hrIni = '';
+  if (prevActs.length > 0) {
+    const last = prevActs[prevActs.length - 1];
+    kmIni = last.kmFin || '';
+    hrIni = last.hrFin || '';
+  }
+  // Store as initial day data with inherited values
+  if (!masterData[currentPlate]) masterData[currentPlate] = { days: {} };
+  masterData[currentPlate].days[day] = {
+    header: { ...getHeaderValues(), fecha: '' },
+    activities: [{ frente:'', desc:'', kmIni, kmFin:'', hrIni, hrFin:'', obs:'', _inherited: true }]
+  };
+  document.getElementById('fecha').value = '';
+}
+
+/* ================================================================
+   SAVE / LOAD
+================================================================ */
+function getHeaderValues() {
+  const placaSel = document.getElementById('placa').value;
+  const placa = placaSel === 'OTRO'
+    ? document.getElementById('placa-manual').value.trim()
+    : placaSel;
+  const c1sel = document.getElementById('c1-select').value;
+  const c1 = c1sel === 'OTRO' ? document.getElementById('c1-manual').value : c1sel;
+  const c2sel = document.getElementById('c2-select').value;
+  const c2 = c2sel === 'OTRO' ? document.getElementById('c2-manual').value : c2sel;
+  return {
+    zona: document.getElementById('zona').value,
+    placa,
+    equipo: document.getElementById('equipo').value,
+    modelo: document.getElementById('modelo').value,
+    fecha: document.getElementById('fecha').value,
+    conductor1: c1, dni1: document.getElementById('c1-dni').value,
+    conductor2: c2, dni2: document.getElementById('c2-dni').value,
+    fuelIni: document.getElementById('fuel-ini').value,
+    fuelAbast: document.getElementById('fuel-abast').value,
+    fuelFin: document.getElementById('fuel-fin').value,
+    fuelConsumo: document.getElementById('fuel-consumo').value,
+    fuelComp: document.getElementById('fuel-comp').value,
+  };
+}
+
+function setHeaderValues(h) {
+  if (!h) return;
+  // Zona
+  document.getElementById('zona').value = h.zona || '';
+  // Placa
+  if (KNOWN_PLATES.includes(h.placa)) {
+    document.getElementById('placa').value = h.placa;
+    document.getElementById('placa-manual-wrap').style.display = 'none';
+  } else if (h.placa) {
+    document.getElementById('placa').value = 'OTRO';
+    document.getElementById('placa-manual').value = h.placa;
+    document.getElementById('placa-manual-wrap').style.display = '';
+  }
+  document.getElementById('equipo').value = h.equipo || '';
+  document.getElementById('modelo').value = h.modelo || '';
+  document.getElementById('fecha').value = h.fecha || '';
+  // C1
+  if (CONDUCTORS.includes(h.conductor1)) {
+    document.getElementById('c1-select').value = h.conductor1;
+    document.getElementById('c1-manual-wrap').style.display = 'none';
+  } else if (h.conductor1) {
+    document.getElementById('c1-select').value = 'OTRO';
+    document.getElementById('c1-manual').value = h.conductor1;
+    document.getElementById('c1-manual-wrap').style.display = '';
+  }
+  document.getElementById('c1-dni').value = h.dni1 || '';
+  // C2
+  if (CONDUCTORS.includes(h.conductor2)) {
+    document.getElementById('c2-select').value = h.conductor2;
+    document.getElementById('c2-manual-wrap').style.display = 'none';
+  } else if (h.conductor2) {
+    document.getElementById('c2-select').value = 'OTRO';
+    document.getElementById('c2-manual').value = h.conductor2;
+    document.getElementById('c2-manual-wrap').style.display = '';
+  }
+  document.getElementById('c2-dni').value = h.dni2 || '';
+  document.getElementById('fuel-ini').value = h.fuelIni || '';
+  document.getElementById('fuel-abast').value = h.fuelAbast || '';
+  document.getElementById('fuel-fin').value = h.fuelFin || '';
+  document.getElementById('fuel-consumo').value = h.fuelConsumo || '';
+  document.getElementById('fuel-comp').value = h.fuelComp || '';
+}
+
+function getActivitiesFromDOM() {
+  const rows = document.querySelectorAll('#act-body tr');
+  return Array.from(rows).map(row => {
+    const inputs = row.querySelectorAll('input');
+    const txts = row.querySelectorAll('textarea');
+    return {
+      frente: txts[0]?.value || '',
+      desc: txts[1]?.value || '',
+      kmIni: inputs[0]?.value || '',
+      kmFin: inputs[1]?.value || '',
+      hrIni: inputs[2]?.value || '',
+      hrFin: inputs[3]?.value || '',
+      obs: txts[2]?.value || '',
+    };
+  });
+}
+
+function autoSaveCurrent() {
+  if (!currentPlate) return;
+  if (!masterData[currentPlate]) masterData[currentPlate] = { days: {} };
+  masterData[currentPlate].days[currentDay] = {
+    header: getHeaderValues(),
+    activities: getActivitiesFromDOM()
+  };
+  persistSave();
+}
+
+function saveDay() {
+  if (!currentPlate) { toast('⚠ Seleccione una placa primero'); return; }
+  autoSaveCurrent();
+  updatePlacaIndicator();
+  renderDayPills();
+  showSaveIndicator();
+  toast(`✓ Día ${currentDay} guardado — Placa: ${currentPlate}`);
+}
+
+function showSaveIndicator() {
+  const el = document.getElementById('save-indicator');
+  el.classList.add('visible');
+  setTimeout(() => el.classList.remove('visible'), 2500);
+}
+
+function loadDayIntoForm(plateKey, day) {
+  const d = masterData[plateKey]?.days?.[day];
+  if (!d) return;
+  setHeaderValues(d.header);
+  // Activities will be rendered by renderActivities()
+}
+
+/* ================================================================
+   ACTIVITIES
+================================================================ */
+function renderActivities() {
+  const tbody = document.getElementById('act-body');
+  tbody.innerHTML = '';
+  const acts = currentPlate && masterData[currentPlate]?.days?.[currentDay]?.activities;
+  if (!acts || acts.length === 0) {
+    addActivity();
+    return;
+  }
+  acts.forEach((act, i) => buildRow(i + 1, act));
+  updateActCount();
+}
+
+function buildRow(num, act) {
+  const tbody = document.getElementById('act-body');
+  const tr = document.createElement('tr');
+  const inh = act._inherited || false;
+  tr.innerHTML = `
+    <td class="row-num">${num}</td>
+    <td><textarea style="width:100%;min-height:38px;font-size:0.82rem" placeholder="Frente de trabajo...">${esc(act.frente)}</textarea></td>
+    <td><textarea style="width:100%;min-height:38px;font-size:0.82rem" placeholder="Descripción del trabajo...">${esc(act.desc)}</textarea></td>
+    <td><input type="number" value="${esc(act.kmIni)}" placeholder="Km." step="0.1"
+        class="${inh && act.kmIni ? 'inherited' : ''}"
+        oninput="propagateKm(this)" style="width:100%"></td>
+    <td><input type="number" value="${esc(act.kmFin)}" placeholder="Km." step="0.1"
+        oninput="onKmFinalInput(this)" style="width:100%"></td>
+    <td><input type="number" value="${esc(act.hrIni)}" placeholder="Hr." step="0.01"
+        class="${inh && act.hrIni ? 'inherited' : ''}"
+        oninput="propagateHr(this)" style="width:100%"></td>
+    <td><input type="number" value="${esc(act.hrFin)}" placeholder="Hr." step="0.01"
+        oninput="onHrFinalInput(this)" style="width:100%"></td>
+    <td><textarea style="width:100%;min-height:38px;font-size:0.82rem" placeholder="Observaciones (opcional)">${esc(act.obs)}</textarea></td>
+    <td style="text-align:center">
+      <button class="btn btn-red btn-sm" onclick="removeRow(this)" title="Eliminar">✕</button>
+    </td>`;
+  tbody.appendChild(tr);
+  updateActCount();
+}
+
+function addActivity() {
+  const tbody = document.getElementById('act-body');
+  const rows = tbody.querySelectorAll('tr');
+  let kmIni = '', hrIni = '', isInherited = false;
+
+  if (rows.length > 0) {
+    const prevInputs = rows[rows.length - 1].querySelectorAll('input');
+    kmIni = prevInputs[1]?.value || '';
+    hrIni = prevInputs[3]?.value || '';
+    isInherited = true;
+  } else if (currentDay > 1 && currentPlate) {
+    const prevDayActs = masterData[currentPlate]?.days?.[currentDay - 1]?.activities || [];
+    if (prevDayActs.length > 0) {
+      const last = prevDayActs[prevDayActs.length - 1];
+      kmIni = last.kmFin || '';
+      hrIni = last.hrFin || '';
+      isInherited = true;
+    }
+  }
+
+  buildRow(rows.length + 1, { frente:'', desc:'', kmIni, kmFin:'', hrIni, hrFin:'', obs:'', _inherited: isInherited });
+  renumberRows();
+}
+
+function onKmFinalInput(input) {
+  // propagate to next row's km initial
+  const row = input.closest('tr');
+  const next = row.nextElementSibling;
+  if (next) {
+    const nextIn = next.querySelectorAll('input')[0];
+    if (nextIn) { nextIn.value = input.value; nextIn.classList.add('inherited'); }
+  }
+}
+
+function onHrFinalInput(input) {
+  const row = input.closest('tr');
+  const next = row.nextElementSibling;
+  if (next) {
+    const nextIn = next.querySelectorAll('input')[2];
+    if (nextIn) { nextIn.value = input.value; nextIn.classList.add('inherited'); }
+  }
+}
+
+function propagateKm(input) { /* handled by onKmFinalInput on the final field */ }
+function propagateHr(input) { /* handled by onHrFinalInput on the final field */ }
+
+function removeRow(btn) {
+  btn.closest('tr').remove();
+  renumberRows();
+  updateActCount();
+  recalcInherited();
+}
+
+function renumberRows() {
+  document.querySelectorAll('#act-body tr').forEach((r, i) => {
+    const c = r.querySelector('.row-num');
+    if (c) c.textContent = i + 1;
+  });
+}
+
+function recalcInherited() {
+  const rows = document.querySelectorAll('#act-body tr');
+  rows.forEach((row, i) => {
+    if (i === 0) return;
+    const prevInputs = rows[i-1].querySelectorAll('input');
+    const curInputs = row.querySelectorAll('input');
+    if (curInputs[0]) {
+      curInputs[0].value = prevInputs[1]?.value || '';
+      curInputs[0].classList.toggle('inherited', !!prevInputs[1]?.value);
+    }
+    if (curInputs[2]) {
+      curInputs[2].value = prevInputs[3]?.value || '';
+      curInputs[2].classList.toggle('inherited', !!prevInputs[3]?.value);
+    }
+  });
+}
+
+function updateActCount() {
+  const n = document.querySelectorAll('#act-body tr').length;
+  document.getElementById('act-count').textContent = `${n} actividad${n !== 1 ? 'es' : ''}`;
+}
+
+function clearForm(clearPlate = true) {
+  if (clearPlate) {
+    document.getElementById('placa').value = '';
+    document.getElementById('placa-manual-wrap').style.display = 'none';
+    document.getElementById('placa-manual').value = '';
+  }
+  document.getElementById('zona').value = '';
+  document.getElementById('equipo').value = '';
+  document.getElementById('modelo').value = '';
+  document.getElementById('fecha').value = new Date().toISOString().slice(0,10);
+  document.getElementById('c1-select').value = '';
+  document.getElementById('c1-manual-wrap').style.display = 'none';
+  document.getElementById('c1-manual').value = '';
+  document.getElementById('c1-dni').value = '';
+  document.getElementById('c2-select').value = '';
+  document.getElementById('c2-manual-wrap').style.display = 'none';
+  document.getElementById('c2-manual').value = '';
+  document.getElementById('c2-dni').value = '';
+  document.getElementById('fuel-ini').value = '';
+  document.getElementById('fuel-abast').value = '';
+  document.getElementById('fuel-fin').value = '';
+  document.getElementById('fuel-consumo').value = '';
+  document.getElementById('fuel-comp').value = '';
+  document.getElementById('act-body').innerHTML = '';
+}
+
+function esc(v) {
+  if (v == null) return '';
+  return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ================================================================
+   SUMMARY
+================================================================ */
+function buildRowsForPlate(plateKey) {
+  const pd = masterData[plateKey];
+  if (!pd) return [];
+  const rows = [];
+  const dayNums = Object.keys(pd.days || {}).map(Number).sort((a,b)=>a-b);
+  dayNums.forEach(day => {
+    const d = pd.days[day];
+    const h = d.header;
+    const acts = d.activities || [];
+    if (acts.length === 0) {
+      rows.push({ day, zona:h.zona, fecha:h.fecha, placa:h.placa, equipo:h.equipo, modelo:h.modelo,
+        c1:h.conductor1, dni1:h.dni1, c2:h.conductor2, dni2:h.dni2,
+        fIni:h.fuelIni, fAbast:h.fuelAbast, fFin:h.fuelFin, fConsumo:h.fuelConsumo, fComp:h.fuelComp,
+        actNum:'—', frente:'', desc:'', kmIni:'', kmFin:'', hrIni:'', hrFin:'', obs:'' });
+    } else {
+      acts.forEach((act, i) => {
+        rows.push({ day, zona:h.zona, fecha:h.fecha, placa:h.placa, equipo:h.equipo, modelo:h.modelo,
+          c1:h.conductor1, dni1:h.dni1, c2:h.conductor2, dni2:h.dni2,
+          fIni:h.fuelIni, fAbast:h.fuelAbast, fFin:h.fuelFin, fConsumo:h.fuelConsumo, fComp:h.fuelComp,
+          actNum:i+1, frente:act.frente, desc:act.desc,
+          kmIni:act.kmIni, kmFin:act.kmFin, hrIni:act.hrIni, hrFin:act.hrFin, obs:act.obs });
+      });
+    }
+  });
+  return rows;
+}
+
+function renderSummary() {
+  autoSaveCurrent();
+
+  const plates = Object.keys(masterData).sort();
+  if (!activePlateTab || !plates.includes(activePlateTab)) {
+    activePlateTab = plates[0] || '';
+  }
+
+  // Global stats
+  let totalDaysCount = 0, totalActs = 0, totalKm = 0, totalHr = 0;
+  plates.forEach(pk => {
+    const pd = masterData[pk];
+    const days = Object.keys(pd.days || {});
+    totalDaysCount += days.length;
+    days.forEach(d => {
+      const acts = pd.days[d].activities || [];
+      totalActs += acts.length;
+      acts.forEach(a => {
+        const kd = (parseFloat(a.kmFin)||0) - (parseFloat(a.kmIni)||0);
+        const hd = (parseFloat(a.hrFin)||0) - (parseFloat(a.hrIni)||0);
+        if (kd > 0) totalKm += kd;
+        if (hd > 0) totalHr += hd;
+      });
+    });
+  });
+  document.getElementById('st-dias').textContent = totalDaysCount;
+  document.getElementById('st-acts').textContent = totalActs;
+  document.getElementById('st-km').textContent = totalKm.toFixed(1);
+  document.getElementById('st-hr').textContent = totalHr.toFixed(1);
+
+  // Plate tabs
+  const tabsContainer = document.getElementById('plate-tabs');
+  tabsContainer.innerHTML = '';
+
+  if (plates.length === 0) {
+    document.getElementById('sum-count').textContent = 'Sin registros guardados';
+    document.getElementById('sum-body').innerHTML = `<tr><td colspan="23" class="no-data-cell">No hay registros guardados. Complete el formulario y presione "Guardar Día".</td></tr>`;
+    return;
+  }
+
+  // ALL tab
+  const allCount = Object.values(masterData).reduce((s, pd) => s + Object.values(pd.days||{}).reduce((ss, d) => ss + (d.activities||[]).length, 0), 0);
+  const allTab = document.createElement('button');
+  allTab.className = 'plate-tab' + (activePlateTab === '__ALL__' ? ' active' : '');
+  allTab.innerHTML = `TODAS <span class="count-badge">${allCount}</span>`;
+  allTab.onclick = () => { activePlateTab = '__ALL__'; renderSummary(); };
+  tabsContainer.appendChild(allTab);
+
+  plates.forEach(pk => {
+    const rowCount = buildRowsForPlate(pk).length;
+    const btn = document.createElement('button');
+    btn.className = 'plate-tab' + (activePlateTab === pk ? ' active' : '');
+    const label = pk.startsWith('OTRO_') ? pk.replace('OTRO_','') : pk;
+    btn.innerHTML = `${label} <span class="count-badge">${rowCount}</span>`;
+    btn.onclick = () => { activePlateTab = pk; renderSummary(); };
+    tabsContainer.appendChild(btn);
+  });
+
+  // Build table rows
+  let rows = [];
+  if (activePlateTab === '__ALL__') {
+    plates.forEach(pk => rows.push(...buildRowsForPlate(pk)));
+  } else if (activePlateTab) {
+    rows = buildRowsForPlate(activePlateTab);
+  }
+
+  document.getElementById('sum-count').textContent = `${rows.length} registro${rows.length!==1?'s':''} — ${activePlateTab === '__ALL__' ? 'Todas las placas' : (activePlateTab.startsWith('OTRO_') ? activePlateTab.replace('OTRO_','') : activePlateTab)}`;
+
+  const tbody = document.getElementById('sum-body');
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="23" class="no-data-cell">Sin registros para esta placa.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = '';
+  rows.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = [r.day, r.zona, r.fecha, r.placa, r.equipo, r.modelo,
+      r.c1, r.dni1, r.c2, r.dni2,
+      r.fIni, r.fAbast, r.fFin, r.fConsumo, r.fComp,
+      r.actNum, r.frente, r.desc,
+      r.kmIni, r.kmFin, r.hrIni, r.hrFin, r.obs
+    ].map(v => `<td>${esc(v)}</td>`).join('');
+    tbody.appendChild(tr);
+  });
+}
+
+/* ================================================================
+   EXPORT EXCEL  — one sheet per plate + one "TODAS"
+================================================================ */
+function exportExcel() {
+  autoSaveCurrent();
+
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  script.onload = doExport;
+  if (typeof XLSX !== 'undefined') { doExport(); return; }
+  document.head.appendChild(script);
+}
+
+function doExport() {
+  const wb = XLSX.utils.book_new();
+  const HEADERS = ['Día','Zona Productiva','Fecha','Placa','Equipo','Modelo',
+    'Conductor 1','DNI C1','Conductor 2','DNI C2',
+    'Comb. Ini (gal)','Abastec. (gal)','Comb. Fin (gal)','Consumo (gal)','Comprobante',
+    'Act. #','Frente de Trabajo','Descripción del Trabajo',
+    'Km Inicial','Km Final','Horom. Inic.','Horom. Final','Observaciones'];
+
+  const WIDTHS = [4,20,12,10,12,8,28,10,28,10,12,12,12,12,16,6,24,32,10,10,10,10,32];
+
+  const plates = Object.keys(masterData).sort();
+  const allRows = [];
+
+  plates.forEach(pk => {
+    const rows = buildRowsForPlate(pk);
+    const wsData = [HEADERS, ...rows.map(r =>
+      [r.day, r.zona, r.fecha, r.placa, r.equipo, r.modelo,
+       r.c1, r.dni1, r.c2, r.dni2,
+       r.fIni, r.fAbast, r.fFin, r.fConsumo, r.fComp,
+       r.actNum, r.frente, r.desc,
+       r.kmIni, r.kmFin, r.hrIni, r.hrFin, r.obs]
+    )];
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    ws['!cols'] = WIDTHS.map(w => ({ wch: w }));
+    const sheetName = (pk.startsWith('OTRO_') ? pk.replace('OTRO_','') : pk).substring(0, 31);
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    allRows.push(...rows);
+  });
+
+  // Sheet "TODAS"
+  if (allRows.length > 0) {
+    const wsAllData = [HEADERS, ...allRows.map(r =>
+      [r.day, r.zona, r.fecha, r.placa, r.equipo, r.modelo,
+       r.c1, r.dni1, r.c2, r.dni2,
+       r.fIni, r.fAbast, r.fFin, r.fConsumo, r.fComp,
+       r.actNum, r.frente, r.desc,
+       r.kmIni, r.kmFin, r.hrIni, r.hrFin, r.obs]
+    )];
+    const wsAll = XLSX.utils.aoa_to_sheet(wsAllData);
+    wsAll['!cols'] = WIDTHS.map(w => ({ wch: w }));
+    XLSX.utils.book_append_sheet(wb, wsAll, 'TODAS LAS PLACAS');
+  }
+
+  const now = new Date();
+  const fname = `SDLA_Conductor_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}.xlsx`;
+  XLSX.writeFile(wb, fname);
+  toast(`✓ Excel descargado (${plates.length} placa${plates.length!==1?'s':''})`);
+}
+
+/* ================================================================
+   CLEAR ALL
+================================================================ */
+function clearAll() {
+  if (!confirm('¿Eliminar TODOS los registros guardados de TODAS las placas?\n\nEsta acción no se puede deshacer.')) return;
+  masterData = {};
+  persistSave();
+  currentPlate = '';
+  currentDay = 1;
+  activePlateTab = '';
+  clearForm(true);
+  document.getElementById('placa-indicator-wrap').innerHTML = '';
+  renderDayPills();
+  renderActivities();
+  renderSummary();
+  toast('Todos los registros eliminados');
+}
+
+/* ================================================================
+   TOAST
+================================================================ */
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+</script>
+
+<!-- XLSX lib -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</body>
+</html>

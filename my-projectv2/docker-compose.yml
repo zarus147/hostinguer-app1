@@ -1,0 +1,15 @@
+services:
+
+  web:
+    build: .
+    container_name: reportday
+    ports:
+      - "4000:80"
+    volumes:
+      - .:/var/www/html
+    networks:
+      - my-project_default
+
+networks:
+  my-project_default:
+    external: true
